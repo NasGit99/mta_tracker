@@ -9,18 +9,37 @@ import (
 	"google.golang.org/protobuf/proto"
 )
 
-type Trip struct {
-	DirectionID uint32
+type TripInfo struct {
+	ID          string
 	RouteID     string
+	DirectionID uint32
 	StartTime   string
 	StartDate   string
-	StopID      string
-	StopName    string
-	VehicleID   string
 }
 
-func stopReader{
-	
+type VehicleInfo struct {
+	ID             string
+	Label          string
+	Occupancy      uint32
+	Congestion     string
+	CurrentStatus  string
+	CurrentStopSeq uint32
+}
+
+type Position struct {
+	Latitude  float64
+	Longitude float64
+	Bearing   float32
+	Speed     float32
+	Timestamp uint64
+}
+
+type TrainData struct {
+	Trip     TripInfo
+	Vehicle  VehicleInfo
+	Position Position
+	StopID   string
+	StopName string
 }
 
 func main() {
@@ -41,21 +60,47 @@ func main() {
 		log.Fatal(err)
 	}
 
-	var trains []Trip
+	var trains []TrainData
+
+	stopMap, err := LoadStops()
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	for _, entity := range feed.Entity {
 		if entity.Vehicle != nil {
-			tr := entity.Vehicle.Trip
-			newTrip := Trip{
-				DirectionID: tr.GetDirectionId(),
-				RouteID:     tr.GetRouteId(),
-				StartTime:   tr.GetStartTime(),
-				StartDate:   tr.GetStartDate(),
-				StopID:      entity.Vehicle.GetStopId(),
-				StopName:    "test_until_figure_out",
-				VehicleID:   entity.Vehicle.Vehicle.GetId(),
+			tripData := entity.Vehicle.Trip
+			vehicleData := entity.Vehicle.Vehicle
+			positionData := entity.Vehicle.Position
+
+			new_train := TrainData{
+				Trip: TripInfo{
+					ID:          tripData.GetTripId(),
+					RouteID:     tripData.GetRouteId(),
+					DirectionID: tripData.GetDirectionId(),
+					StartTime:   tripData.GetStartTime(),
+					StartDate:   tripData.GetStartDate(),
+				},
+				Vehicle: VehicleInfo{
+					ID:             vehicleData.GetId(),
+					Label:          vehicleData.GetLabel(),
+					Occupancy:      entity.Vehicle.GetOccupancyPercentage(),
+					Congestion:     entity.Vehicle.GetCongestionLevel().String(),
+					CurrentStatus:  entity.Vehicle.GetCurrentStatus().String(),
+					CurrentStopSeq: entity.Vehicle.GetCurrentStopSequence(),
+				},
+				Position: Position{
+					Latitude:  float64(positionData.GetLatitude()),
+					Longitude: float64(positionData.GetLongitude()),
+					Bearing:   positionData.GetBearing(),
+					Speed:     positionData.GetSpeed(),
+					Timestamp: entity.Vehicle.GetTimestamp(),
+				},
+				StopID:   *entity.Vehicle.StopId,
+				StopName: GetStopName(stopMap, *entity.Vehicle.StopId),
 			}
-			trains = append(trains, newTrip)
+
+			trains = append(trains, new_train)
 		}
 	}
 
