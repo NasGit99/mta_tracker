@@ -1,48 +1,17 @@
-package main
+package data
 
 import (
 	"io"
 	"log"
 	"net/http"
 
+	"mta_tracker/internal/model"
+
 	"github.com/MobilityData/gtfs-realtime-bindings/golang/gtfs"
 	"google.golang.org/protobuf/proto"
 )
 
-type TripInfo struct {
-	ID          string
-	RouteID     string
-	DirectionID uint32
-	StartTime   string
-	StartDate   string
-}
-
-type VehicleInfo struct {
-	ID             string
-	Label          string
-	Occupancy      uint32
-	Congestion     string
-	CurrentStatus  string
-	CurrentStopSeq uint32
-}
-
-type Position struct {
-	Latitude  float64
-	Longitude float64
-	Bearing   float32
-	Speed     float32
-	Timestamp uint64
-}
-
-type TrainData struct {
-	Trip     TripInfo
-	Vehicle  VehicleInfo
-	Position Position
-	StopID   string
-	StopName string
-}
-
-func main() {
+func Train_data() {
 	resp, err := http.Get("https://api-endpoint.mta.info/Dataservice/mtagtfsfeeds/nyct%2Fgtfs-ace")
 	if err != nil {
 		log.Fatal(err)
@@ -60,7 +29,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	var trains []TrainData
+	var trains []model.TrainData
 
 	stopMap, err := LoadStops()
 	if err != nil {
@@ -73,15 +42,15 @@ func main() {
 			vehicleData := entity.Vehicle.Vehicle
 			positionData := entity.Vehicle.Position
 
-			new_train := TrainData{
-				Trip: TripInfo{
+			new_train := model.TrainData{
+				Trip: model.TripInfo{
 					ID:          tripData.GetTripId(),
 					RouteID:     tripData.GetRouteId(),
 					DirectionID: tripData.GetDirectionId(),
 					StartTime:   tripData.GetStartTime(),
 					StartDate:   tripData.GetStartDate(),
 				},
-				Vehicle: VehicleInfo{
+				Vehicle: model.VehicleInfo{
 					ID:             vehicleData.GetId(),
 					Label:          vehicleData.GetLabel(),
 					Occupancy:      entity.Vehicle.GetOccupancyPercentage(),
@@ -89,7 +58,7 @@ func main() {
 					CurrentStatus:  entity.Vehicle.GetCurrentStatus().String(),
 					CurrentStopSeq: entity.Vehicle.GetCurrentStopSequence(),
 				},
-				Position: Position{
+				Position: model.Position{
 					Latitude:  float64(positionData.GetLatitude()),
 					Longitude: float64(positionData.GetLongitude()),
 					Bearing:   positionData.GetBearing(),
@@ -97,7 +66,7 @@ func main() {
 					Timestamp: entity.Vehicle.GetTimestamp(),
 				},
 				StopID:   *entity.Vehicle.StopId,
-				StopName: GetStopName(stopMap, *entity.Vehicle.StopId),
+				StopName: stopMap[*entity.Vehicle.StopId],
 			}
 
 			trains = append(trains, new_train)
