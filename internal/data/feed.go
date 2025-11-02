@@ -11,7 +11,7 @@ import (
 	"google.golang.org/protobuf/proto"
 )
 
-func Train_data() {
+func Train_data() ([]model.TrainData, error) {
 	resp, err := http.Get("https://api-endpoint.mta.info/Dataservice/mtagtfsfeeds/nyct%2Fgtfs-ace")
 	if err != nil {
 		log.Fatal(err)
@@ -72,9 +72,5 @@ func Train_data() {
 			trains = append(trains, new_train)
 		}
 	}
-
-	log.Printf("Loaded %d trips", len(trains))
-	for _, t := range trains {
-		log.Printf("%+v\n", t)
-	}
+	return trains, nil
 }
