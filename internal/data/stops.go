@@ -19,8 +19,9 @@ func LoadStops() (map[string]string, error) {
 		if line == "" {
 			continue
 		}
-		parts := strings.SplitN(line, ",", 2)
-		if len(parts) == 2 {
+
+		parts := strings.Split(line, ",")
+		if len(parts) >= 2 {
 			id := strings.TrimSpace(parts[0])
 			name := strings.TrimSpace(parts[1])
 			stopMap[id] = name
