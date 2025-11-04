@@ -32,3 +32,9 @@ type TrainData struct {
 	StopID   string
 	StopName string
 }
+
+type TripRoute struct {
+	RouteID  string
+	TripName string
+	TripID   string
+}

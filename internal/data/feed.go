@@ -12,7 +12,7 @@ import (
 )
 
 func Train_data() ([]model.TrainData, error) {
-	resp, err := http.Get("https://api-endpoint.mta.info/Dataservice/mtagtfsfeeds/nyct%2Fgtfs-ace")
+	resp, err := http.Get("https://api-endpoint.mta.info/Dataservice/mtagtfsfeeds/nyct%2Fgtfs")
 	if err != nil {
 		log.Fatal(err)
 	}

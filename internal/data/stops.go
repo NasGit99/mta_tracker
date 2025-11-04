@@ -6,12 +6,12 @@ import (
 )
 
 func LoadStops() (map[string]string, error) {
-	dat, err := os.ReadFile("assets/stops.txt")
+	data, err := os.ReadFile("assets/stops.txt")
 	if err != nil {
 		return nil, err
 	}
 
-	lines := strings.Split(string(dat), "\n")
+	lines := strings.Split(string(data), "\n")
 	stopMap := make(map[string]string)
 
 	for _, line := range lines {
