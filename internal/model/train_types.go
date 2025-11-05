@@ -6,6 +6,7 @@ type TripInfo struct {
 	DirectionID uint32
 	StartTime   string
 	StartDate   string
+	TripName    string
 }
 
 type VehicleInfo struct {
@@ -31,10 +32,4 @@ type TrainData struct {
 	Position Position
 	StopID   string
 	StopName string
-}
-
-type TripRoute struct {
-	RouteID  string
-	TripName string
-	TripID   string
 }

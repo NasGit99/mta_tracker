@@ -5,4 +5,5 @@ type Routes struct {
 	TripName  string
 	TripID    string
 	Direction string
+	RouteID   string
 }
