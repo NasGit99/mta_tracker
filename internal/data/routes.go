@@ -15,11 +15,6 @@ func LoadRoutes() (map[string]model.Routes, error) {
 	lines := strings.Split(string(data), "\n")
 	routeMap := make(map[string]model.Routes)
 
-	trips, err := LoadTrips()
-	if err != nil {
-		return nil, err
-	}
-
 	for _, line := range lines {
 		line = strings.TrimSpace(line)
 		if line == "" {
@@ -28,23 +23,23 @@ func LoadRoutes() (map[string]model.Routes, error) {
 
 		parts := strings.Split(line, ",")
 		if len(parts) >= 4 {
-			id := strings.TrimSpace(parts[1])
+			routeID := strings.TrimSpace(parts[1])
 			route := strings.TrimSpace(parts[3])
-			direction := GetDirection(id)
 
-			tripName := ""
-			if trip, ok := trips[id]; ok {
-				tripName = trip.TripName
-			}
-
-			routeMap[id] = model.Routes{
+			routeMap[routeID] = model.Routes{
 				RouteName: route,
-				Direction: direction,
-				TripName:  tripName,
-				TripID:    id,
+				RouteID:   routeID,
 			}
 		}
 	}
 
 	return routeMap, nil
+}
+
+func ParseRoute(routeMap map[string]model.Routes, routeID string) model.Routes {
+	routeID = strings.TrimSpace(routeID)
+	if route, ok := routeMap[routeID]; ok {
+		return route
+	}
+	return model.Routes{}
 }

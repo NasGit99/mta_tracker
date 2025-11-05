@@ -1,19 +1,20 @@
 package data
 
 import (
+	"fmt"
 	"mta_tracker/internal/model"
 	"os"
 	"strings"
 )
 
-func LoadTrips() (map[string]model.TripRoute, error) {
+func LoadTrips() (map[string]model.TripInfo, error) {
 	data, err := os.ReadFile("assets/trips.txt")
 	if err != nil {
 		return nil, err
 	}
 
 	lines := strings.Split(string(data), "\n")
-	tripMap := make(map[string]model.TripRoute)
+	tripMap := make(map[string]model.TripInfo)
 
 	for _, line := range lines {
 		line = strings.TrimSpace(line)
@@ -22,26 +23,29 @@ func LoadTrips() (map[string]model.TripRoute, error) {
 		}
 
 		parts := strings.Split(line, ",")
-		if len(parts) >= 6 {
+		if len(parts) >= 4 {
 			routeID := strings.TrimSpace(parts[0])
 			tripID := strings.TrimSpace(parts[1])
-			name := strings.TrimSpace(parts[3])
+			tripName := strings.TrimSpace(parts[3])
 
-			tripMap[routeID] = model.TripRoute{
+			tripMap[tripID] = model.TripInfo{
 				RouteID:  routeID,
-				TripName: name,
-				TripID:   tripID,
+				TripName: tripName,
+				ID:       tripID,
 			}
 		}
+	}
+	for k, v := range tripMap {
+		fmt.Println("LoadedTrip:", k, v.TripName)
 	}
 
 	return tripMap, nil
 }
 
-func GetTripName(tripMap map[string]model.TripRoute, tripID string) string {
+func GetTrip(tripMap map[string]model.TripInfo, tripID string) model.TripInfo {
 	tripID = strings.TrimSpace(tripID)
 	if trip, ok := tripMap[tripID]; ok {
-		return trip.TripName
+		return trip
 	}
-	return ""
+	return model.TripInfo{}
 }
