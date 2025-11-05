@@ -14,15 +14,21 @@ func main() {
 	}
 	log.Printf("Loaded %d trips", len(trains))
 
-	fmt.Println("Trip ID | Route ID | StopID | StopName | DirectionID | TrainStatus")
+	fmt.Println("Route Name | RouteID|  Trip Name | Direction | StopName | TrainStatus")
+
+	routeMap, err := data.LoadRoutes()
+	if err != nil {
+		return
+	}
 
 	for _, t := range trains {
-		fmt.Printf("%s | %s  | %s | %s | %d | %s\n",
-			t.Trip.ID,
-			t.Trip.RouteID,
+		route := data.ParseRoute(routeMap, t.Trip.RouteID)
+
+		fmt.Printf("%s | %s | %s | %s | %s\n",
+			route.RouteName,
+			route.RouteID,
 			data.GetDirection(t.StopID),
 			t.StopName,
-			t.Trip.DirectionID,
 			t.Vehicle.CurrentStatus,
 		)
 	}

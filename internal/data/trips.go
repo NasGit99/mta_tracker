@@ -1,12 +1,13 @@
 package data
 
 import (
-	"fmt"
 	"mta_tracker/internal/model"
 	"os"
 	"strings"
 )
 
+// Currently live feeds TripId might not always match so this function is not being
+// used right now.
 func LoadTrips() (map[string]model.TripInfo, error) {
 	data, err := os.ReadFile("assets/trips.txt")
 	if err != nil {
@@ -34,9 +35,6 @@ func LoadTrips() (map[string]model.TripInfo, error) {
 				ID:       tripID,
 			}
 		}
-	}
-	for k, v := range tripMap {
-		fmt.Println("LoadedTrip:", k, v.TripName)
 	}
 
 	return tripMap, nil
